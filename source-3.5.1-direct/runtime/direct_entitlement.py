@@ -17,9 +17,7 @@ PUBLIC_KEY_HEX = "1C69F083A1A40A73F759F02DC3BD8516AF70D500BE201AF062C16A1949EF80
 PUBLIC_KEY = bytes.fromhex(PUBLIC_KEY_HEX)
 PERSISTED_LICENSE_NAME = ".ql_direct_entitlement"
 INSTALL_ID_NAME = ".ql_install_id"
-
 FULL_ONLY_SCREENS = frozenset({"UNIVERSALE","MULTIVERSO","BUTTERFLY","EVENTI","IEC","PRONOSTICI","SIMULAZIONE","BACKTEST","MAI_ESTRATTE"})
-
 _Q=2**255-19
 _L=2**252+27742317777372353535851937790883648493
 _D=(-121665*pow(121666,_Q-2,_Q))%_Q
@@ -42,6 +40,8 @@ def _mul(p,e):
         if e&1: q=_add(q,p)
         p=_add(p,p); e>>=1
     return q
+def _encode(p):
+    x,y,z,_=p; zi=_inv(z); x=x*zi%_Q; y=y*zi%_Q; out=bytearray(y.to_bytes(32,"little")); out[31]|=(x&1)<<7; return bytes(out)
 def _decode(s):
     if len(s)!=32: raise ValueError("point length")
     y=int.from_bytes(s,"little")&((1<<255)-1)
@@ -49,10 +49,8 @@ def _decode(s):
     x=_xrecover(y)
     if (x&1)!=(s[31]>>7): x=_Q-x
     p=(x,y,1,x*y%_Q)
-    if _mul(p,_L)[:2]!=(0,1): raise ValueError("point subgroup")
+    if _encode(_mul(p,_L)) != bytes([1])+bytes(31): raise ValueError("point subgroup")
     return p
-def _encode(p):
-    x,y,z,_=p; zi=_inv(z); x=x*zi%_Q; y=y*zi%_Q; out=bytearray(y.to_bytes(32,"little")); out[31]|=(x&1)<<7; return bytes(out)
 def _verify(message,signature):
     if len(signature)!=64: return False
     try:
@@ -85,7 +83,6 @@ def installation_id(storage_dir):
         if not raw:
             raw=uuid.uuid4().hex+secrets.token_hex(16); tmp=marker.with_suffix(".tmp"); tmp.write_text(raw,encoding="utf-8"); os.replace(tmp,marker)
     d=hashlib.sha256((PACKAGE_ID+"|"+raw).encode()).hexdigest().upper(); return "QLD-"+"-".join(d[i:i+4] for i in range(0,24,4))
-
 @dataclass(frozen=True)
 class LicenseStatus:
     recognized: bool; valid: bool; full_access: bool; role: str="FREE"; reason: str=""; license_id: str=""
