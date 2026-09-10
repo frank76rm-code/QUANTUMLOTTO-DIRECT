@@ -1,0 +1,80 @@
+name: QUANTUM LOTTO 3.5.1 DIRECT first build
+
+on:
+  push:
+    branches: [build/quantum-lotto-3.5.1-direct-first]
+    paths: ['.github/workflows/3.5.1-direct-first-build.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-direct:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - name: Checkout DIRECT repository
+        uses: actions/checkout@v4
+
+      - name: Checkout exact stable 3.4.2 source
+        uses: actions/checkout@v4
+        with:
+          repository: frank76rm-code/QUANTUMLOTTO
+          ref: dc0bfdb81f6c6ec4a1f345b976e0134e01a3df3f
+          path: stable342
+
+      - name: Verify and prepare 3.5.1 DIRECT
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f stable342/quantum-lotto3.4.2.zip
+          python3 source-3.5.1-direct/scripts/verify_3_4_2_baseline.py stable342/quantum-lotto3.4.2.zip
+          rm -rf work && mkdir work
+          unzip -q stable342/quantum-lotto3.4.2.zip -d work/project
+          rm -rf work/project/private-signing
+          python3 source-3.5.1-direct/scripts/apply_3_5_1_direct.py work/project
+          cp source-3.5.1-direct/scripts/security_preflight.py work/project/scripts/security_preflight.py
+          python3 work/project/scripts/preflight.py
+          python3 work/project/scripts/security_preflight.py work/project
+          python3 -m py_compile work/project/main.py work/project/quantum_lotto/*.py
+
+      - name: Verify protected 3.4.2 engines are byte-identical
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf baseline342 && mkdir baseline342
+          unzip -q stable342/quantum-lotto3.4.2.zip -d baseline342
+          for f in quantum_engine.py universal_engine.py multiverse_engine.py chaos_engine.py event_engine.py simulation_engine.py statistics_engine.py database.py data_import.py; do
+            cmp baseline342/quantum_lotto/$f work/project/quantum_lotto/$f
+          done
+          echo PROTECTED_9_OF_9_OK
+
+      - name: Run DIRECT entitlement tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p work/project/tests
+          cp source-3.5.1-direct/tests/test_direct_entitlement.py work/project/tests/
+          cp source-3.5.1-direct/tests/test_ed25519_rfc8032.py work/project/tests/
+          python3 -m pip install -q pytest
+          cd work/project
+          python3 -m pytest -q tests/test_direct_entitlement.py tests/test_ed25519_rfc8032.py
+
+      - name: Build unsigned diagnostic APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker build --pull -t quantum-lotto-direct-build:3.5.1 work/project/ci
+          docker run --rm -e CI=1 -v "$PWD/work/project:/home/user/hostcwd" quantum-lotto-direct-build:3.5.1 buildozer -v android debug
+          mapfile -t APKS < <(find work/project/bin -maxdepth 1 -type f -name '*.apk' -print)
+          test "${#APKS[@]}" -ge 1
+          mkdir -p output
+          cp "${APKS[0]}" output/Quantum-Lotto-v3.5.1-DIRECT-first-build.apk
+
+      - name: Upload diagnostic APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Quantum-Lotto-v3.5.1-DIRECT-first-build
+          path: output/Quantum-Lotto-v3.5.1-DIRECT-first-build.apk
+          if-no-files-found: error
