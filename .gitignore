@@ -1,0 +1,22 @@
+# QUANTUM LOTTO DIRECT: private licensing material must never be versioned
+*.pem
+*.key
+*.p8
+*.pk8
+*.jks
+*.keystore
+*.p12
+*.pfx
+*private*key*
+*ed25519*private*
+license-private/
+private-license/
+secrets/
+.env
+.env.*
+
+# Local build/runtime noise
+__pycache__/
+*.pyc
+.buildozer/
+bin/
