@@ -1,11 +1,22 @@
-# QUANTUMLOTTO DIRECT
+# QUANTUM LOTTO 3.5.1 DIRECT
 
-Repository privata dedicata alla linea QUANTUM LOTTO DIRECT distribuita fuori Google Play.
+Private DIRECT release line based exclusively on the verified QUANTUM LOTTO 3.4.2 stable source.
 
-Base sorgente obbligatoria: QUANTUM LOTTO 3.4.2 stabile, branch sorgente `release/quantum-lotto-3.4.2`, commit `dc0bfdb81f6c6ec4a1f345b976e0134e01a3df3f`.
+## Mandatory baseline
 
-La linea DIRECT mantiene package `com.frankpetra.quantumlotto` e la stessa identità di firma Android della 3.4.2 per garantire la continuità degli aggiornamenti compatibili.
+- source repository: `frank76rm-code/QUANTUMLOTTO`
+- source branch: `release/quantum-lotto-3.4.2`
+- source commit: `dc0bfdb81f6c6ec4a1f345b976e0134e01a3df3f`
+- source archive Git blob: `22418e4ae6d6e92fa10f69074d48dae4e43f984d`
+- source archive SHA-256: `42695fbebbb0cbfb9f9b2e2c1a2ca62c0bf86c8afd7d5b7a5dfa3b91d9b3de59`
+- package: `com.frankpetra.quantumlotto`
 
-Il sistema di licenza DIRECT usa una coppia Ed25519 separata dalla firma Android. La chiave privata Ed25519 non deve essere mai inserita nel repository o nell'APK; nell'app può essere presente esclusivamente la chiave pubblica di verifica.
+The algorithms, historical archives, mathematical analyses and statistical engine of 3.4.2 are protected and must not be modified by the DIRECT patch.
 
-Algoritmi, archivi, analisi matematiche e motore statistico della 3.4.2 sono protetti e non devono essere modificati.
+## DIRECT licensing
+
+3.5.1 DIRECT uses an offline Ed25519 entitlement verifier. Only the public verification key belongs in application source. The Ed25519 private signing key must never be committed, embedded in the APK or copied into build artifacts.
+
+Android APK signing is a separate identity and must remain compatible with the historical 3.4.2 signing certificate.
+
+See `BASELINE-3.4.2-PROVENANCE.txt`, `source-3.5.1-direct/SECURITY.md` and the preflight scripts before any release build.

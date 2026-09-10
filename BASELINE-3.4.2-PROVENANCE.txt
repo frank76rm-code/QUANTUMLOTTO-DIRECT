@@ -1,0 +1,20 @@
+QUANTUM LOTTO 3.4.2 BASELINE PROVENANCE
+
+Source repository: frank76rm-code/QUANTUMLOTTO
+Source branch: release/quantum-lotto-3.4.2
+Source commit: dc0bfdb81f6c6ec4a1f345b976e0134e01a3df3f
+Source tree: 7a39b0a0a2d77a55792ffe6fb0ef91b0cadf0ad7
+Source archive: quantum-lotto3.4.2.zip
+Archive size: 10998828 bytes
+Git blob SHA-1: 22418e4ae6d6e92fa10f69074d48dae4e43f984d
+SHA-256: 42695fbebbb0cbfb9f9b2e2c1a2ca62c0bf86c8afd7d5b7a5dfa3b91d9b3de59
+Package: com.frankpetra.quantumlotto
+Version name: 3.4.2
+Version code: 30402
+Historical Android signing certificate SHA-256: FE2B95397D99625A7858EC744059C726E9619F0E329B0EBE59158880B23AA186
+
+Verification performed 2026-09-10:
+The locally supplied quantum-lotto3.4.2.zip has exactly the Git blob SHA-1 above. This proves byte-for-byte identity with the source archive stored in the mandatory 3.4.2 release source.
+
+Security note:
+The archive contains private-signing/quantum-lotto-signing-bundle.enc. It is encrypted Android signing material. It is deliberately NOT copied into the DIRECT repository source tree. The Ed25519 private license-signing key is also forbidden from this repository and from the APK.
