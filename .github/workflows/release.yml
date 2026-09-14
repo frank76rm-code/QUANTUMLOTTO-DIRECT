@@ -1,0 +1,30 @@
+name: Prepare QUANTUM LOTTO 3.6.1 Release
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/release.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create public release if missing
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if gh release view v3.6.1-direct --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Release v3.6.1-direct already exists."
+          else
+            gh release create v3.6.1-direct \
+              --repo "$GITHUB_REPOSITORY" \
+              --title "QUANTUM LOTTO 3.6.1" \
+              --notes "Release pubblica dell'APK Android QUANTUM LOTTO 3.6.1 per distribuzione diretta. L'app è uno strumento di analisi matematica e statistica per Lotto e 10eLotto e non garantisce vincite."
+          fi
