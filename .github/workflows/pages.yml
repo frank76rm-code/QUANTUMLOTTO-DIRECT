@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -21,13 +21,28 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Rebuild poster
+      - name: Ensure poster asset exists
         shell: bash
         run: |
           set -euo pipefail
-          cat poster-parts/part-*.txt > /tmp/poster.b64
-          base64 --decode /tmp/poster.b64 > poster.webp
+          if [ ! -s poster.webp ]; then
+            cat poster-parts/part-*.txt > /tmp/poster.b64
+            base64 --decode /tmp/poster.b64 > poster.webp
+          fi
           echo "0824f45b11ee7c564a29502e61fef86ea0a2d5ad78ab934c961502c30f6f12bf  poster.webp" | sha256sum -c -
+
+      - name: Materialize poster and remove temporary chunks
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -d poster-parts ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add poster.webp
+            git rm -r poster-parts
+            git commit -m "Materialize QUANTUM LOTTO poster asset"
+            git push origin HEAD:main
+          fi
 
       - name: Prepare site
         shell: bash
