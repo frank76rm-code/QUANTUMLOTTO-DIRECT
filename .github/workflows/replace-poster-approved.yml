@@ -1,0 +1,29 @@
+name: Replace approved site poster
+
+on:
+  push:
+    paths:
+      - '.github/workflows/replace-poster-approved.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  replace-poster:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download approved poster
+        run: |
+          curl -fL --retry 3 'https://cdn.creativeclaw.co/u/095daac2/images/0c140bbf-96e6-4457-9d40-383f390c2f5e.png' -o poster.png
+          file poster.png
+
+      - name: Commit approved poster
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add poster.png
+          git commit -m 'Replace site poster with approved image' || exit 0
+          git push
