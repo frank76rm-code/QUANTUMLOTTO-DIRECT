@@ -29,7 +29,14 @@
   }).render("#paypal-container-VH8VWPKGF9PPL")
 </script>
 <div class="modal-actions"><button class="close">Chiudi</button></div></div></div>
-<div class="backdrop" id="year"><div class="modal"><h2>FULL annuale — € 39,99</h2><ul><li>Apri la schermata <b>Attivazione</b>.</li><li>Premi <b>COPIA CODICE</b>.</li><li>Invia il codice a Tabaccheria Petralia.</li><li>Dopo il pagamento ricevi il file personale <b>.qlk</b> valido 12 mesi.</li></ul><div class="modal-actions"><button class="close">Chiudi</button></div></div></div>
+<div class="backdrop" id="year"><div class="modal"><h2>FULL annuale — € 39,99</h2><ul><li>Apri la schermata <b>Attivazione</b>.</li><li>Premi <b>COPIA CODICE</b>.</li><li>Invia il codice a Tabaccheria Petralia.</li><li>Dopo il pagamento ricevi il file personale <b>.qlk</b> valido 12 mesi.</li></ul>
+<div id="paypal-container-5W98ENMTFQDME"></div>
+<script>
+  paypal.HostedButtons({
+    hostedButtonId: "5W98ENMTFQDME",
+  }).render("#paypal-container-5W98ENMTFQDME")
+</script>
+<div class="modal-actions"><button class="close">Chiudi</button></div></div></div>
 <script>
 document.querySelectorAll('[data-open]').forEach(btn=>btn.addEventListener('click',()=>document.getElementById(btn.dataset.open).classList.add('open')));document.querySelectorAll('.close').forEach(btn=>btn.addEventListener('click',()=>btn.closest('.backdrop').classList.remove('open')));document.querySelectorAll('.backdrop').forEach(bg=>bg.addEventListener('click',e=>{if(e.target===bg)bg.classList.remove('open')}));document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.backdrop.open').forEach(x=>x.classList.remove('open'))});
 </script>
