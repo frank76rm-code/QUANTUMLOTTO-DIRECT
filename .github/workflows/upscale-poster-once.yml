@@ -1,0 +1,57 @@
+name: Upscale poster once
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/upscale-poster-once.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  upscale:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Pillow
+        run: python -m pip install --upgrade pillow
+
+      - name: Upscale poster to Full HD vertical
+        run: |
+          python - <<'PY'
+          from PIL import Image, ImageFilter
+          from pathlib import Path
+
+          p = Path('poster.webp')
+          img = Image.open(p).convert('RGB')
+          print('Original size:', img.size)
+
+          target = (1080, 1920)
+          if img.size != target:
+              img = img.resize(target, Image.Resampling.LANCZOS)
+              img = img.filter(ImageFilter.UnsharpMask(radius=0.8, percent=120, threshold=2))
+              img.save(p, 'WEBP', quality=96, method=6)
+              print('New size:', img.size)
+          else:
+              print('Poster already at target size')
+          PY
+
+      - name: Commit upgraded poster
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add poster.webp
+          if git diff --cached --quiet; then
+            echo 'No poster changes to commit'
+            exit 0
+          fi
+          git commit -m 'Upgrade website poster to 1080x1920'
+          git push
