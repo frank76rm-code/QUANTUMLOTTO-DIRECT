@@ -26,15 +26,15 @@ jobs:
         run: |
           set -euo pipefail
           test -s index.html
-          test -s poster.webp
-          echo "0824f45b11ee7c564a29502e61fef86ea0a2d5ad78ab934c961502c30f6f12bf  poster.webp" | sha256sum -c -
+          test -s poster.png
+          echo "9484c6cb445d6142b0fa446034a4e26469a7fbe29c43485ecc82ba175d353e22  poster.png" | sha256sum -c -
 
       - name: Prepare site
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p _site
-          cp index.html poster.webp _site/
+          cp index.html poster.png _site/
           touch _site/.nojekyll
 
       - name: Configure Pages
