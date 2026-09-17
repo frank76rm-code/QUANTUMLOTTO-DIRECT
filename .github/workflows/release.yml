@@ -1,4 +1,4 @@
-name: Prepare QUANTUM LOTTO 3.6.1 Release
+name: Prepare QUANTUM LOTTO 3.6.3 Release
 
 on:
   push:
@@ -21,25 +21,27 @@ jobs:
         run: |
           set -euo pipefail
           NOTES=$(cat <<'EOF'
-          Release pubblica dell'APK Android QUANTUM LOTTO 3.6.1 per distribuzione diretta.
+          Release pubblica dell'APK Android QUANTUM LOTTO 3.6.3 per distribuzione diretta.
 
           File APK atteso:
-          `Quantum-Lotto-v3.6.1-COMMERCIAL-release.apk`
+          `Quantum-Lotto-v3.6.3-COMMERCIAL-release.apk`
 
           SHA-256 APK:
-          `5836c0ea8d6071bc144bed68caa8d302dbf5c0cd8ee79042d337e5edbfc559fd`
+          `8019ba7bbebf1933553b5ccf0e72830fa0344402d16eb3dd79453dc6c617d246`
+
+          Novità principali: selezione periodo analisi con date italiane e licenze con scadenza esatta a data/ora italiana.
 
           QUANTUM LOTTO è uno strumento di analisi matematica e statistica per Lotto e 10eLotto. Non garantisce vincite.
           EOF
           )
-          if gh release view v3.6.1-direct --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            gh release edit v3.6.1-direct \
+          if gh release view v3.6.3-direct --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release edit v3.6.3-direct \
               --repo "$GITHUB_REPOSITORY" \
-              --title "QUANTUM LOTTO 3.6.1" \
+              --title "QUANTUM LOTTO 3.6.3" \
               --notes "$NOTES"
           else
-            gh release create v3.6.1-direct \
+            gh release create v3.6.3-direct \
               --repo "$GITHUB_REPOSITORY" \
-              --title "QUANTUM LOTTO 3.6.1" \
+              --title "QUANTUM LOTTO 3.6.3" \
               --notes "$NOTES"
           fi
