@@ -1,0 +1,64 @@
+name: Publish QUANTUM LOTTO 3.6.3 Direct APK
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/publish-3.6.3-once.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      ARTIFACT_URL: "https://sdmntpritalynorth.oaiusercontent.com/files/00000000-58fc-8246-acb8-4faa8c5fd9b5/raw?se=2026-09-17T07%3A25%3A03Z&sp=r&sv=2026-02-06&sr=b&scid=8e375a20-0715-5eb5-8ee7-7a8aeab0cf54&skoid=9b41a688-1b44-4731-856e-b0efcf3660ed&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-09-16T20%3A05%3A00Z&ske=2026-09-17T20%3A05%3A00Z&sks=b&skv=2026-02-06&sig=MVFfq36ZpU1F8nge8MWptLZZGPnbhYQPrXP4UXRwVPc%3D"
+      APK: Quantum-Lotto-v3.6.3-COMMERCIAL-release.apk
+      APK_SHA256: 8019ba7bbebf1933553b5ccf0e72830fa0344402d16eb3dd79453dc6c617d246
+      TAG: v3.6.3-direct
+    steps:
+      - name: Download certified build artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fL --retry 4 --retry-delay 2 "$ARTIFACT_URL" -o ql363.zip
+          unzip -q ql363.zip "$APK"
+          echo "$APK_SHA256  $APK" | sha256sum -c -
+
+      - name: Create release and upload APK
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          NOTES=$(cat <<EOF
+          Release pubblica dell'APK Android QUANTUM LOTTO 3.6.3 per distribuzione diretta.
+
+          File APK:
+          \`$APK\`
+
+          SHA-256 APK:
+          \`$APK_SHA256\`
+
+          Novità principali: selezione periodo analisi con date italiane e licenze con scadenza esatta a data/ora italiana.
+
+          QUANTUM LOTTO è uno strumento di analisi matematica e statistica per Lotto e 10eLotto. Non garantisce vincite.
+          EOF
+          )
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release edit "$TAG" --repo "$GITHUB_REPOSITORY" --title "QUANTUM LOTTO 3.6.3" --notes "$NOTES"
+          else
+            gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --title "QUANTUM LOTTO 3.6.3" --notes "$NOTES"
+          fi
+          gh release upload "$TAG" "$APK" --repo "$GITHUB_REPOSITORY" --clobber
+
+      - name: Verify public release asset
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json tagName,assets > release.json
+          grep -q 'Quantum-Lotto-v3.6.3-COMMERCIAL-release.apk' release.json
