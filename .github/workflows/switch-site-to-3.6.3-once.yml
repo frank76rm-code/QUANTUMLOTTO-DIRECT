@@ -1,0 +1,72 @@
+name: Switch QUANTUM LOTTO site to 3.6.3
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/switch-site-to-3.6.3-once.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  switch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Update public page and permanent release metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          replacements={
+            'Quantum-Lotto-v3.6.1-COMMERCIAL-release.apk':'Quantum-Lotto-v3.6.3-COMMERCIAL-release.apk',
+            '5836c0ea8d6071bc144bed68caa8d302dbf5c0cd8ee79042d337e5edbfc559fd':'8019ba7bbebf1933553b5ccf0e72830fa0344402d16eb3dd79453dc6c617d246',
+            'v3.6.1-direct':'v3.6.3-direct',
+            'SCARICA APK 3.6.1':'SCARICA APK 3.6.3',
+          }
+          for old,new in replacements.items():
+              if old not in s:
+                  raise SystemExit(f'missing expected index token: {old}')
+              s=s.replace(old,new)
+          if '3.6.1-COMMERCIAL-release.apk' in s or 'v3.6.1-direct' in s or 'SCARICA APK 3.6.1' in s:
+              raise SystemExit('old public 3.6.1 reference remains in index.html')
+          p.write_text(s,encoding='utf-8')
+
+          p=Path('.github/workflows/release.yml')
+          s=p.read_text(encoding='utf-8')
+          replacements={
+            'Prepare QUANTUM LOTTO 3.6.1 Release':'Prepare QUANTUM LOTTO 3.6.3 Release',
+            'QUANTUM LOTTO 3.6.1':'QUANTUM LOTTO 3.6.3',
+            'v3.6.1-direct':'v3.6.3-direct',
+            'Quantum-Lotto-v3.6.1-COMMERCIAL-release.apk':'Quantum-Lotto-v3.6.3-COMMERCIAL-release.apk',
+            '5836c0ea8d6071bc144bed68caa8d302dbf5c0cd8ee79042d337e5edbfc559fd':'8019ba7bbebf1933553b5ccf0e72830fa0344402d16eb3dd79453dc6c617d246',
+          }
+          for old,new in replacements.items():
+              if old not in s:
+                  raise SystemExit(f'missing expected release token: {old}')
+              s=s.replace(old,new)
+          p.write_text(s,encoding='utf-8')
+          PY
+
+          grep -q 'Quantum-Lotto-v3.6.3-COMMERCIAL-release.apk' index.html
+          grep -q '8019ba7bbebf1933553b5ccf0e72830fa0344402d16eb3dd79453dc6c617d246' index.html
+          grep -q 'v3.6.3-direct' index.html
+          grep -q 'SCARICA APK 3.6.3' index.html
+
+      - name: Commit site switch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html .github/workflows/release.yml
+          git commit -m 'Publish QUANTUM LOTTO 3.6.3 on public site'
+          git push origin HEAD:main
